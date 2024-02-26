@@ -1,5 +1,6 @@
 const User = require('../models/UserSchema')
 const bcrypt = require('bcrypt');
+const  jwt = require('jsonwebtoken')
 const signupController = async (req, res) =>{
     try {
         const {email, password} = req.body;
@@ -46,11 +47,24 @@ const loginController = async (req, res) =>{
                 message: 'password incorrect'
             })
         }
+        const token = generateToken({user: user._id, email: user.email});
         return res.status(202).json({
             message : 'user details are below',
             user,
+            token
         })
 
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const generateToken = (data) =>{
+    try {
+        const token = jwt.sign(data, 'token_key', {
+            expiresIn: '1hr'
+        });
+        return token
     } catch (error) {
         console.log(error);
     }
